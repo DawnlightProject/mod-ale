@@ -16,7 +16,7 @@ using namespace Hooks;
 #define START_HOOK(EVENT) \
     if (!ALEConfig::GetInstance().IsALEEnabled())\
         return;\
-    auto key = EventKey<PlayerEvents>(EVENT);\
+    auto key = EventKey<Hooks::PlayerEvents>(EVENT);\
     if (!PlayerEventBindings->HasBindingsFor(key))\
         return;\
     LOCK_ALE
@@ -24,7 +24,7 @@ using namespace Hooks;
 #define START_HOOK_WITH_RETVAL(EVENT, RETVAL) \
     if (!ALEConfig::GetInstance().IsALEEnabled())\
         return RETVAL;\
-    auto key = EventKey<PlayerEvents>(EVENT);\
+    auto key = EventKey<Hooks::PlayerEvents>(EVENT);\
     if (!PlayerEventBindings->HasBindingsFor(key))\
         return RETVAL;\
     LOCK_ALE

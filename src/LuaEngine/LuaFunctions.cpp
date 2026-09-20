@@ -417,6 +417,8 @@ ALERegister<Unit> UnitMethods[] =
     { "IsMounted", &LuaUnit::IsMounted },
     { "AttackStop", &LuaUnit::AttackStop },
     { "Attack", &LuaUnit::Attack },
+    { "SendMeleeAttackStart", &LuaUnit::SendMeleeAttackStart },
+    { "SendMeleeAttackStop", &LuaUnit::SendMeleeAttackStop },
     // {"IsVisible", &LuaUnit::IsVisible},                              // :IsVisible() - UNDOCUMENTED
     // {"IsMoving", &LuaUnit::IsMoving},                                // :IsMoving() - UNDOCUMENTED
     // {"IsFlying", &LuaUnit::IsFlying},                                // :IsFlying() - UNDOCUMENTED
@@ -730,6 +732,7 @@ ALERegister<Player> PlayerMethods[] =
     { "HasTitleByIndex", &LuaPlayer::HasTitleByIndex },
     { "IsAtGroupRewardDistance", &LuaPlayer::IsAtGroupRewardDistance },
     { "IsAtLootRewardDistance", &LuaPlayer::IsAtLootRewardDistance },
+    { "SendGameObjectLoot", &LuaPlayer::SendGameObjectLoot },
     { "CanTeleport", &LuaPlayer::CanTeleport },
     { "IsSpectator", &LuaPlayer::IsSpectator },
     { "HasKnownTaxiNode", &LuaPlayer::HasKnownTaxiNode },

@@ -406,6 +406,38 @@ namespace LuaUnit
     }
 
     /**
+     * Puts the [Unit] in the melee attack STANCE towards a victim, without making
+     * it swing.
+     *
+     * This sends SMSG_ATTACKSTART, which is what makes the client hold the
+     * combat-ready loop -- the wind-up pose between blows, not a blow. It is
+     * normally sent by Unit::Attack, but only when that is called with
+     * meleeAttack = true, which also sets UNIT_STATE_MELEE_ATTACKING and brings
+     * the auto-attack swings back. Exposing the packet on its own is the only way
+     * to get the stance without the swings.
+     *
+     * @param [Unit] victim
+     */
+    int SendMeleeAttackStart(lua_State* L, Unit* unit)
+    {
+        Unit* victim = ALE::CHECKOBJ<Unit>(L, 2);
+        unit->SendMeleeAttackStart(victim);
+        return 0;
+    }
+
+    /**
+     * Drops the melee attack stance, sending SMSG_ATTACKSTOP.
+     *
+     * @param [Unit] victim : optional
+     */
+    int SendMeleeAttackStop(lua_State* L, Unit* unit)
+    {
+        Unit* victim = ALE::CHECKOBJ<Unit>(L, 2, false);
+        unit->SendMeleeAttackStop(victim);
+        return 0;
+    }
+
+    /**
      * Returns true if the [Unit] is on a [Vehicle].
      *
      * @return bool isOnVehicle

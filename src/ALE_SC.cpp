@@ -21,6 +21,7 @@
 #include "LuaEngine.h"
 #include "Pet.h"
 #include "Player.h"
+#include "ScriptHookSubscription.h"
 #include "ScriptMgr.h"
 #include "ScriptedGossip.h"
 
@@ -571,10 +572,9 @@ public:
 class ALE_PetScript : public PetScript
 {
 public:
-    ALE_PetScript() : PetScript("ALE_PetScript", {
-        PETHOOK_ON_PET_ADD_TO_WORLD
-    }) { }
+    ALE_PetScript() : PetScript("ALE_PetScript") { }
 
+    AC_USES_HOOK(PetScript, OnPetAddToWorld);
     void OnPetAddToWorld(Pet* pet) override
     {
         sALE->OnPetAddedToWorld(pet->GetOwner(), pet);
@@ -584,74 +584,15 @@ public:
 class ALE_PlayerScript : public PlayerScript
 {
 public:
-    ALE_PlayerScript() : PlayerScript("ALE_PlayerScript", {
-        PLAYERHOOK_ON_PLAYER_RESURRECT,
-        PLAYERHOOK_CAN_PLAYER_USE_CHAT,
-        PLAYERHOOK_CAN_PLAYER_USE_PRIVATE_CHAT,
-        PLAYERHOOK_CAN_PLAYER_USE_GROUP_CHAT,
-        PLAYERHOOK_CAN_PLAYER_USE_GUILD_CHAT,
-        PLAYERHOOK_CAN_PLAYER_USE_CHANNEL_CHAT,
-        PLAYERHOOK_ON_LOOT_ITEM,
-        PLAYERHOOK_ON_PLAYER_LEARN_TALENTS,
-        PLAYERHOOK_CAN_USE_ITEM,
-        PLAYERHOOK_ON_EQUIP,
-        PLAYERHOOK_ON_PLAYER_ENTER_COMBAT,
-        PLAYERHOOK_ON_PLAYER_LEAVE_COMBAT,
-        PLAYERHOOK_CAN_REPOP_AT_GRAVEYARD,
-        PLAYERHOOK_ON_QUEST_ABANDON,
-        PLAYERHOOK_ON_MAP_CHANGED,
-        PLAYERHOOK_ON_GOSSIP_SELECT,
-        PLAYERHOOK_ON_GOSSIP_SELECT_CODE,
-        PLAYERHOOK_ON_PVP_KILL,
-        PLAYERHOOK_ON_CREATURE_KILL,
-        PLAYERHOOK_ON_PLAYER_KILLED_BY_CREATURE,
-        PLAYERHOOK_ON_LEVEL_CHANGED,
-        PLAYERHOOK_ON_FREE_TALENT_POINTS_CHANGED,
-        PLAYERHOOK_ON_TALENTS_RESET,
-        PLAYERHOOK_ON_MONEY_CHANGED,
-        PLAYERHOOK_ON_GIVE_EXP,
-        PLAYERHOOK_ON_REPUTATION_CHANGE,
-        PLAYERHOOK_ON_DUEL_REQUEST,
-        PLAYERHOOK_ON_DUEL_START,
-        PLAYERHOOK_ON_DUEL_END,
-        PLAYERHOOK_ON_EMOTE,
-        PLAYERHOOK_ON_TEXT_EMOTE,
-        PLAYERHOOK_ON_SPELL_CAST,
-        PLAYERHOOK_ON_LOGIN,
-        PLAYERHOOK_ON_LOGOUT,
-        PLAYERHOOK_ON_CREATE,
-        PLAYERHOOK_ON_SAVE,
-        PLAYERHOOK_ON_DELETE,
-        PLAYERHOOK_ON_BIND_TO_INSTANCE,
-        PLAYERHOOK_ON_UPDATE_AREA,
-        PLAYERHOOK_ON_UPDATE_ZONE,
-        PLAYERHOOK_ON_FIRST_LOGIN,
-        PLAYERHOOK_ON_LEARN_SPELL,
-        PLAYERHOOK_ON_ACHI_COMPLETE,
-        PLAYERHOOK_ON_FFA_PVP_STATE_UPDATE,
-        PLAYERHOOK_CAN_INIT_TRADE,
-        PLAYERHOOK_CAN_SEND_MAIL,
-        PLAYERHOOK_CAN_JOIN_LFG,
-        PLAYERHOOK_ON_QUEST_REWARD_ITEM,
-        PLAYERHOOK_ON_GROUP_ROLL_REWARD_ITEM,
-        PLAYERHOOK_ON_CREATE_ITEM,
-        PLAYERHOOK_ON_STORE_NEW_ITEM,
-        PLAYERHOOK_ON_PLAYER_COMPLETE_QUEST,
-        PLAYERHOOK_CAN_GROUP_INVITE,
-        PLAYERHOOK_ON_BATTLEGROUND_DESERTION,
-        PLAYERHOOK_ON_CREATURE_KILLED_BY_PET,
-        PLAYERHOOK_ON_CAN_UPDATE_SKILL,
-        PLAYERHOOK_ON_BEFORE_UPDATE_SKILL,
-        PLAYERHOOK_ON_UPDATE_SKILL,
-        PLAYERHOOK_CAN_RESURRECT,
-        PLAYERHOOK_ON_PLAYER_RELEASED_GHOST
-    }) { }
+    ALE_PlayerScript() : PlayerScript("ALE_PlayerScript") { }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerResurrect);
     void OnPlayerResurrect(Player* player, float /*restore_percent*/, bool& /*applySickness*/) override
     {
         sALE->OnResurrect(player);
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerCanUseChat);
     bool OnPlayerCanUseChat(Player* player, uint32 type, uint32 lang, std::string& msg) override
     {
         if (type != CHAT_MSG_SAY && type != CHAT_MSG_YELL && type != CHAT_MSG_EMOTE)
@@ -663,6 +604,7 @@ public:
         return true;
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerCanUsePrivateChat);
     bool OnPlayerCanUseChat(Player* player, uint32 type, uint32 lang, std::string& msg, Player* target) override
     {
         if (!sALE->OnChat(player, type, lang, msg, target))
@@ -671,6 +613,7 @@ public:
         return true;
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerCanUseGroupChat);
     bool OnPlayerCanUseChat(Player* player, uint32 type, uint32 lang, std::string& msg, Group* group) override
     {
         if (!sALE->OnChat(player, type, lang, msg, group))
@@ -679,6 +622,7 @@ public:
         return true;
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerCanUseGuildChat);
     bool OnPlayerCanUseChat(Player* player, uint32 type, uint32 lang, std::string& msg, Guild* guild) override
     {
         if (!sALE->OnChat(player, type, lang, msg, guild))
@@ -687,6 +631,7 @@ public:
         return true;
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerCanUseChannelChat);
     bool OnPlayerCanUseChat(Player* player, uint32 type, uint32 lang, std::string& msg, Channel* channel) override
     {
         if (!sALE->OnChat(player, type, lang, msg, channel))
@@ -695,273 +640,327 @@ public:
         return true;
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerLootItem);
     void OnPlayerLootItem(Player* player, Item* item, uint32 count, ObjectGuid lootguid) override
     {
         sALE->OnLootItem(player, item, count, lootguid);
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerLearnTalents);
     void OnPlayerLearnTalents(Player* player, uint32 talentId, uint32 talentRank, uint32 spellid) override
     {
         sALE->OnLearnTalents(player, talentId, talentRank, spellid);
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerCanUseItem);
     bool OnPlayerCanUseItem(Player* player, ItemTemplate const* proto, InventoryResult& result) override
     {
         result = sALE->OnCanUseItem(player, proto->ItemId);
         return result != EQUIP_ERR_OK ? false : true;
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerEquip);
     void OnPlayerEquip(Player* player, Item* it, uint8 bag, uint8 slot, bool /*update*/) override
     {
         sALE->OnEquip(player, it, bag, slot);
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerEnterCombat);
     void OnPlayerEnterCombat(Player* player, Unit* enemy) override
     {
         sALE->OnPlayerEnterCombat(player, enemy);
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerLeaveCombat);
     void OnPlayerLeaveCombat(Player* player) override
     {
         sALE->OnPlayerLeaveCombat(player);
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerCanRepopAtGraveyard);
     bool OnPlayerCanRepopAtGraveyard(Player* player) override
     {
         sALE->OnRepop(player);
         return true;
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerQuestAbandon);
     void OnPlayerQuestAbandon(Player* player, uint32 questId) override
     {
         sALE->OnQuestAbandon(player, questId);
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerMapChanged);
     void OnPlayerMapChanged(Player* player) override
     {
         sALE->OnMapChanged(player);
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerGossipSelect);
     void OnPlayerGossipSelect(Player* player, uint32 menu_id, uint32 sender, uint32 action) override
     {
         sALE->HandleGossipSelectOption(player, menu_id, sender, action, "");
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerGossipSelectCode);
     void OnPlayerGossipSelectCode(Player* player, uint32 menu_id, uint32 sender, uint32 action, const char* code) override
     {
         sALE->HandleGossipSelectOption(player, menu_id, sender, action, code);
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerPVPKill);
     void OnPlayerPVPKill(Player* killer, Player* killed) override
     {
         sALE->OnPVPKill(killer, killed);
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerCreatureKill);
     void OnPlayerCreatureKill(Player* killer, Creature* killed) override
     {
         sALE->OnCreatureKill(killer, killed);
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerKilledByCreature);
     void OnPlayerKilledByCreature(Creature* killer, Player* killed) override
     {
         sALE->OnPlayerKilledByCreature(killer, killed);
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerLevelChanged);
     void OnPlayerLevelChanged(Player* player, uint8 oldLevel) override
     {
         sALE->OnLevelChanged(player, oldLevel);
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerFreeTalentPointsChanged);
     void OnPlayerFreeTalentPointsChanged(Player* player, uint32 points) override
     {
         sALE->OnFreeTalentPointsChanged(player, points);
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerTalentsReset);
     void OnPlayerTalentsReset(Player* player, bool noCost) override
     {
         sALE->OnTalentsReset(player, noCost);
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerMoneyChanged);
     void OnPlayerMoneyChanged(Player* player, int32& amount) override
     {
         sALE->OnMoneyChanged(player, amount);
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerGiveXP);
     void OnPlayerGiveXP(Player* player, uint32& amount, Unit* victim, uint8 xpSource) override
     {
         sALE->OnGiveXP(player, amount, victim, xpSource);
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerReputationChange);
     bool OnPlayerReputationChange(Player* player, uint32 factionID, int32& standing, bool incremental) override
     {
         return sALE->OnReputationChange(player, factionID, standing, incremental);
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerDuelRequest);
     void OnPlayerDuelRequest(Player* target, Player* challenger) override
     {
         sALE->OnDuelRequest(target, challenger);
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerDuelStart);
     void OnPlayerDuelStart(Player* player1, Player* player2) override
     {
         sALE->OnDuelStart(player1, player2);
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerDuelEnd);
     void OnPlayerDuelEnd(Player* winner, Player* loser, DuelCompleteType type) override
     {
         sALE->OnDuelEnd(winner, loser, type);
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerEmote);
     void OnPlayerEmote(Player* player, uint32 emote) override
     {
         sALE->OnEmote(player, emote);
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerTextEmote);
     void OnPlayerTextEmote(Player* player, uint32 textEmote, uint32 emoteNum, ObjectGuid guid) override
     {
         sALE->OnTextEmote(player, textEmote, emoteNum, guid);
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerSpellCast);
     void OnPlayerSpellCast(Player* player, Spell* spell, bool skipCheck) override
     {
         sALE->OnPlayerSpellCast(player, spell, skipCheck);
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerLogin);
     void OnPlayerLogin(Player* player) override
     {
         sALE->OnLogin(player);
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerLogout);
     void OnPlayerLogout(Player* player) override
     {
         sALE->OnLogout(player);
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerCreate);
     void OnPlayerCreate(Player* player) override
     {
         sALE->OnCreate(player);
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerSave);
     void OnPlayerSave(Player* player) override
     {
         sALE->OnSave(player);
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerDelete);
     void OnPlayerDelete(ObjectGuid guid, uint32 /*accountId*/) override
     {
         sALE->OnDelete(guid.GetCounter());
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerBindToInstance);
     void OnPlayerBindToInstance(Player* player, Difficulty difficulty, uint32 mapid, bool permanent) override
     {
         sALE->OnBindToInstance(player, difficulty, mapid, permanent);
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerUpdateArea);
     void OnPlayerUpdateArea(Player* player, uint32 oldArea, uint32 newArea) override
     {
         sALE->OnUpdateArea(player, oldArea, newArea);
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerUpdateZone);
     void OnPlayerUpdateZone(Player* player, uint32 newZone, uint32 newArea) override
     {
         sALE->OnUpdateZone(player, newZone, newArea);
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerFirstLogin);
     void OnPlayerFirstLogin(Player* player) override
     {
         sALE->OnFirstLogin(player);
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerLearnSpell);
     void OnPlayerLearnSpell(Player* player, uint32 spellId) override
     {
         sALE->OnLearnSpell(player, spellId);
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerAchievementComplete);
     void OnPlayerAchievementComplete(Player* player, AchievementEntry const* achievement) override
     {
         sALE->OnAchiComplete(player, achievement);
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerFfaPvpStateUpdate);
     void OnPlayerFfaPvpStateUpdate(Player* player, bool IsFlaggedForFfaPvp) override
     {
         sALE->OnFfaPvpStateUpdate(player, IsFlaggedForFfaPvp);
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerCanInitTrade);
     bool OnPlayerCanInitTrade(Player* player, Player* target) override
     {
         return sALE->OnCanInitTrade(player, target);
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerCanSendMail);
     bool OnPlayerCanSendMail(Player* player, ObjectGuid receiverGuid, ObjectGuid mailbox, std::string& subject, std::string& body, uint32 money, uint32 cod, Item* item) override
     {
         return sALE->OnCanSendMail(player, receiverGuid, mailbox, subject, body, money, cod, item);
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerCanJoinLfg);
     bool OnPlayerCanJoinLfg(Player* player, uint8 roles, lfg::LfgDungeonSet& dungeons, const std::string& comment) override
     {
         return sALE->OnCanJoinLfg(player, roles, dungeons, comment);
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerQuestRewardItem);
     void OnPlayerQuestRewardItem(Player* player, Item* item, uint32 count) override
     {
         sALE->OnQuestRewardItem(player, item, count);
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerGroupRollRewardItem);
     void OnPlayerGroupRollRewardItem(Player* player, Item* item, uint32 count, RollVote voteType, Roll* roll) override
     {
         sALE->OnGroupRollRewardItem(player, item, count, voteType, roll);
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerCreateItem);
     void OnPlayerCreateItem(Player* player, Item* item, uint32 count) override
     {
         sALE->OnCreateItem(player, item, count);
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerStoreNewItem);
     void OnPlayerStoreNewItem(Player* player, Item* item, uint32 count) override
     {
         sALE->OnStoreNewItem(player, item, count);
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerCompleteQuest);
     void OnPlayerCompleteQuest(Player* player, Quest const* quest) override
     {
         sALE->OnPlayerCompleteQuest(player, quest);
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerCanGroupInvite);
     bool OnPlayerCanGroupInvite(Player* player, std::string& memberName) override
     {
         return sALE->OnCanGroupInvite(player, memberName);
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerBattlegroundDesertion);
     void OnPlayerBattlegroundDesertion(Player* player, const BattlegroundDesertionType type) override
     {
         sALE->OnBattlegroundDesertion(player, type);
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerCreatureKilledByPet);
     void OnPlayerCreatureKilledByPet(Player* player, Creature* killed) override
     {
         sALE->OnCreatureKilledByPet(player, killed);
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerCanUpdateSkill);
     bool OnPlayerCanUpdateSkill(Player* player, uint32 skill_id) override
     {
         return sALE->OnPlayerCanUpdateSkill(player, skill_id);
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerBeforeUpdateSkill);
     void OnPlayerBeforeUpdateSkill(Player* player, uint32 skill_id, uint32& value, uint32 max, uint32 step) override
     {
         sALE->OnPlayerBeforeUpdateSkill(player, skill_id, value, max, step);
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerUpdateSkill);
     void OnPlayerUpdateSkill(Player* player, uint32 skill_id, uint32 value, uint32 max, uint32 step, uint32 new_value) override
     {
         sALE->OnPlayerUpdateSkill(player, skill_id, value, max, step, new_value);
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerCanResurrect);
     bool OnPlayerCanResurrect(Player* player) override
     {
         return sALE->CanPlayerResurrect(player);
     }
 
+    AC_USES_HOOK(PlayerScript, OnPlayerReleasedGhost);
     void OnPlayerReleasedGhost(Player* player) override
     {
         sALE->OnPlayerReleasedGhost(player);
@@ -1103,24 +1102,15 @@ public:
 class ALE_WorldScript : public WorldScript
 {
 public:
-    ALE_WorldScript() : WorldScript("ALE_WorldScript", {
-        WORLDHOOK_ON_OPEN_STATE_CHANGE,
-        WORLDHOOK_ON_BEFORE_CONFIG_LOAD,
-        WORLDHOOK_ON_AFTER_CONFIG_LOAD,
-        WORLDHOOK_ON_SHUTDOWN_INITIATE,
-        WORLDHOOK_ON_SHUTDOWN_CANCEL,
-        WORLDHOOK_ON_UPDATE,
-        WORLDHOOK_ON_STARTUP,
-        WORLDHOOK_ON_SHUTDOWN,
-        WORLDHOOK_ON_AFTER_UNLOAD_ALL_MAPS,
-        WORLDHOOK_ON_BEFORE_WORLD_INITIALIZED
-    }) { }
+    ALE_WorldScript() : WorldScript("ALE_WorldScript") { }
 
+    AC_USES_HOOK(WorldScript, OnOpenStateChange);
     void OnOpenStateChange(bool open) override
     {
         sALE->OnOpenStateChange(open);
     }
 
+    AC_USES_HOOK(WorldScript, OnBeforeConfigLoad);
     void OnBeforeConfigLoad(bool reload) override
     {
         ALEConfig::GetInstance().Initialize(reload);
@@ -1134,41 +1124,49 @@ public:
         sALE->OnConfigLoad(reload, true);
     }
 
+    AC_USES_HOOK(WorldScript, OnAfterConfigLoad);
     void OnAfterConfigLoad(bool reload) override
     {
         sALE->OnConfigLoad(reload, false);
     }
 
+    AC_USES_HOOK(WorldScript, OnShutdownInitiate);
     void OnShutdownInitiate(ShutdownExitCode code, ShutdownMask mask) override
     {
         sALE->OnShutdownInitiate(code, mask);
     }
 
+    AC_USES_HOOK(WorldScript, OnShutdownCancel);
     void OnShutdownCancel() override
     {
         sALE->OnShutdownCancel();
     }
 
+    AC_USES_HOOK(WorldScript, OnUpdate);
     void OnUpdate(uint32 diff) override
     {
         sALE->OnWorldUpdate(diff);
     }
 
+    AC_USES_HOOK(WorldScript, OnStartup);
     void OnStartup() override
     {
         sALE->OnStartup();
     }
 
+    AC_USES_HOOK(WorldScript, OnShutdown);
     void OnShutdown() override
     {
         sALE->OnShutdown();
     }
 
+    AC_USES_HOOK(WorldScript, OnAfterUnloadAllMaps);
     void OnAfterUnloadAllMaps() override
     {
         ALE::Uninitialize();
     }
 
+    AC_USES_HOOK(WorldScript, OnBeforeWorldInitialized);
     void OnBeforeWorldInitialized() override
     {
         ///- Run ALE scripts.

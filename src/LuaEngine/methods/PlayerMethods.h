@@ -10,6 +10,7 @@
 #include "Chat.h"
 #include "GameTime.h"
 #include "GossipDef.h"
+#include "LootMgr.h"
 
 /***
  * Inherits all methods from: [Object], [WorldObject], [Unit]
@@ -4634,6 +4635,33 @@ namespace LuaPlayer
         WorldObject const* target = ALE::CHECKOBJ<WorldObject>(L, 2);
         ALE::Push(L, player->IsAtLootRewardDistance(target));
         return 1;
+    }
+
+    /**
+     * Fills a [GameObject] with the given loot template and opens its loot window for the [Player].
+     *
+     * GameObjectTemplate::GetLootId only answers for chests and fishing holes, so a type that
+     * carries no loot id of its own can only be looted this way. The loot is filled here and the
+     * object left activated, which is what makes SendLoot send it rather than regenerate it.
+     *
+     * @param [GameObject] object : the object to loot
+     * @param uint32 lootId : an entry in gameobject_loot_template
+     */
+    int SendGameObjectLoot(lua_State* L, Player* player)
+    {
+        GameObject* object = ALE::CHECKOBJ<GameObject>(L, 2);
+        uint32 lootId = ALE::CHECKVAL<uint32>(L, 3);
+
+        object->loot.clear();
+        object->loot.FillLoot(lootId, LootTemplates_Gameobject, player, true, false, object->GetLootMode(), object);
+        object->SetLootGenerationTime();
+        object->SetLootState(GO_ACTIVATED, player);
+
+        // LOOT_SKINNING is the type Spell::EffectOpenLock uses for a chest. LOOT_CORPSE is
+        // refused by SendLoot for any object that comes from the gameobject table and carries a
+        // respawn time.
+        player->SendLoot(object->GetGUID(), LOOT_SKINNING);
+        return 0;
     }
 
     /**
